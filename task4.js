@@ -2,8 +2,25 @@ const assert = require('assert');
 // node.js bitSet structure for working with bits (same as C++ std::bitset).
 const BitSet = require('bitset');
 
-// format numbers with padding zeros
-const padNumberWithZeros = (num, size) =>  {
+
+class Time {
+  static toMinutes(timeString) {
+    let timeParts = timeString.split(':');
+    let hours = parseInt(timeParts[0], 10);
+    let minutes = parseInt(timeParts[1], 10);
+
+    return hours * 60 + minutes; 
+  }
+
+  static formatTime(minutes) {
+    let hours = Math.trunc(minutes / 60);
+    let minutesPart = minutes % 60;
+
+    return `${this._padNumberWithZeros(hours, 2)}:${this._padNumberWithZeros(minutesPart, 2)}`;
+  }
+
+  // format numbers with padding zeros
+  static _padNumberWithZeros(num, size){
     let s = num + '';
     
     while (s.length < size) {
@@ -11,37 +28,15 @@ const padNumberWithZeros = (num, size) =>  {
     }
 
     return s;
+  }
 }
-
-const convertTimeToMinutes = (timeString) => {
-  let timeParts = timeString.split(':');
-  let hours = parseInt(timeParts[0], 10);
-  let minutes = parseInt(timeParts[1], 10);
-
-  return hours * 60 + minutes; 
-}
-
-console.assert(convertTimeToMinutes('00:01') === 1);
-console.assert(convertTimeToMinutes('09:00') === 540);
-console.assert(convertTimeToMinutes('17:45') === 1065);
-
-const convertMinutesToTime = (minutes) => {
-  let hours = Math.trunc(minutes / 60);
-  let minutesPart = minutes % 60;
-
-  return `${padNumberWithZeros(hours, 2)}:${padNumberWithZeros(minutesPart, 2)}`;
-}
-
-console.assert(convertMinutesToTime(convertTimeToMinutes('00:01')) === '00:01');
-console.assert(convertMinutesToTime(convertTimeToMinutes('09:00')) === '09:00');
-console.assert(convertMinutesToTime(convertTimeToMinutes('17:45')) === '17:45');
 
 class MeetingPlanner {
   constructor(settings) {
     settings |= {};
 
-    this._beginningOfTheWorkday = convertTimeToMinutes(settings.beginningOfTheWorkday || '09:00');
-    this._endOfTheWorkday = convertTimeToMinutes(settings.endOfTheWorkday || '19:00');
+    this._beginningOfTheWorkday = Time.toMinutes(settings.beginningOfTheWorkday || '09:00');
+    this._endOfTheWorkday = Time.toMinutes(settings.endOfTheWorkday || '19:00');
   }
 
   findInterval(schedules, duration) {
@@ -61,8 +56,8 @@ class MeetingPlanner {
 
     // Format intervals in 24h format
     intervals.forEach(interval => {
-      interval[0] = convertMinutesToTime(interval[0]);
-      interval[1] = convertMinutesToTime(interval[1]);
+      interval[0] = Time.formatTime(interval[0]);
+      interval[1] = Time.formatTime(interval[1]);
     });
 
     return intervals.length ? intervals[0] : null;
@@ -77,8 +72,8 @@ class MeetingPlanner {
       bitSet.setRange(this._beginningOfTheWorkday, this._endOfTheWorkday - 1, 1);
 
       schedule.forEach(meeting => {
-        let meetingStartMinutes = convertTimeToMinutes(meeting[0]);
-        let meetingEndMinutes = convertTimeToMinutes(meeting[1]);
+        let meetingStartMinutes = Time.toMinutes(meeting[0]);
+        let meetingEndMinutes = Time.toMinutes(meeting[1]);
 
         bitSet.setRange(meetingStartMinutes, meetingEndMinutes - 1, 0)
       });
@@ -127,6 +122,16 @@ class MeetingPlanner {
     return intervals;
   }
 }
+
+console.assert(Time.toMinutes('00:01') === 1);
+console.assert(Time.toMinutes('09:00') === 540);
+console.assert(Time.toMinutes('17:45') === 1065);
+
+
+console.assert(Time.formatTime(Time.toMinutes('00:01')) === '00:01');
+console.assert(Time.formatTime(Time.toMinutes('09:00')) === '09:00');
+console.assert(Time.formatTime(Time.toMinutes('17:45')) === '17:45');
+
 
 let meetingDuration = 60;
 
