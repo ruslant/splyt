@@ -123,14 +123,15 @@ class MeetingPlanner {
   }
 }
 
-console.assert(Time.toMinutes('00:01') === 1);
-console.assert(Time.toMinutes('09:00') === 540);
-console.assert(Time.toMinutes('17:45') === 1065);
+// assert Time.toMinutes method
+assert(Time.toMinutes('00:01') === 1);
+assert(Time.toMinutes('09:00') === 540);
+assert(Time.toMinutes('17:45') === 1065);
 
-
-console.assert(Time.formatTime(Time.toMinutes('00:01')) === '00:01');
-console.assert(Time.formatTime(Time.toMinutes('09:00')) === '09:00');
-console.assert(Time.formatTime(Time.toMinutes('17:45')) === '17:45');
+// assert Time.formatTime method
+assert(Time.formatTime(Time.toMinutes('00:01')) === '00:01');
+assert(Time.formatTime(Time.toMinutes('09:00')) === '09:00');
+assert(Time.formatTime(Time.toMinutes('17:45')) === '17:45');
 
 
 let meetingDuration = 60;
